@@ -6,6 +6,6 @@ require 'coveralls'
 
 Coveralls.wear!
 
-require 'open_webslides/converter'
+require 'openwebslides/converter'
 
 include OpenWebslides::Converter

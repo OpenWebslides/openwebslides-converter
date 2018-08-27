@@ -8,7 +8,7 @@ Converts arbitrary documents to Open Webslides data format.
 
 ## Examples
 
-    require 'open_webslides/converter'
+    require 'openwebslides/converter'
 
 ## Requirements
 
