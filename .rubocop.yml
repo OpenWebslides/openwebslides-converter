@@ -1,0 +1,16 @@
+Metrics/LineLength:
+  Max: 120
+
+Metrics/BlockLength:
+  Exclude:
+    - openwebslides-converter.gemspec
+
+Style/HashSyntax:
+  EnforcedStyle: hash_rockets
+
+Style/MixinUsage:
+  Exclude:
+    - spec/spec_helper.rb
+
+Style/NestedParenthesizedCalls:
+  Enabled: false
