@@ -11,9 +11,15 @@ module OpenWebslides
             @id ||= generate_id
           end
 
+          ##
+          # Convert property to hash
+          #
+          # This is the start of the chain of overridden #to_h methods.
+          # In all subsequent included property modules, #to_h should call
+          # `super.merge :property => property`
+          #
           def to_h
-            h = { :id => id }
-            defined?(super) ? super.merge(h) : h
+            { :id => id }
           end
 
           private

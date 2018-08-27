@@ -12,8 +12,7 @@ module OpenWebslides
           end
 
           def to_h
-            h = { :type => type }
-            defined?(super) ? super.merge(h) : h
+            super.merge :type => type
           end
         end
       end

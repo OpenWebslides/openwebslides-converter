@@ -12,8 +12,7 @@ module OpenWebslides
           end
 
           def to_h
-            h = { :child_item_ids => child_item_ids }
-            defined?(super) ? super.merge(h) : h
+            super.merge :child_item_ids => child_item_ids
           end
         end
       end
