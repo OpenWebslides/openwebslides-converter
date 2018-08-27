@@ -28,7 +28,7 @@ module OpenWebslides
         root.child_item_ids.concat parse_parts
         root.child_item_ids << parse_back_matter
 
-        # result.content_items << root
+        result.content_items << root
 
         result
       end
@@ -55,7 +55,7 @@ module OpenWebslides
         heading.text = html.at('.front-matter-title').content
 
         # Parse front matter paragraphs
-        paragraphs = html.search('.front-matter p').map { |p| parse_paragraph p }
+        paragraphs = html.search('.front-matter p').map { |p| parse_paragraph p }.compact
 
         # Add paragraphs to the front matter header
         heading.sub_item_ids = paragraphs.map &:id
@@ -71,57 +71,36 @@ module OpenWebslides
       # Find and parse parts
       #
       def parse_parts
-        parts = html.search('div.part').map do |part|
-          # Create new heading
-          heading = Content::Heading.new
+        parts = []
 
-          # Set title
-          heading.text = part.at('.part-title').content
+        html.search('div.part, div.chapter').each do |div|
+          if div.classes.include? 'part'
+            # Create new part heading
+            parts << Content::Heading.new
 
-          # Part intro (paragraphs under part header)
-          intro = part.search('p').map { |p| parse_paragraph p }
-          heading.sub_item_ids = intro.map &:id
-          result.content_items.concat intro
+            # Set title
+            parts.last.text = div.at('.part-title').content
 
-          # Parse part chapters
-          chapters = part.search('.chapter').map { |c| parse_chapter c}
+            # Part intro (paragraphs under part header)
+            intro = div.search('p').map { |p| parse_paragraph p }.compact
+            parts.last.sub_item_ids = intro.map &:id
 
-          if chapters.any?
-            # Add paragraphs to the part header
-            heading.sub_item_ids.concat chapters.map &:id
-            result.content_items.concat chapters
+            # Add intro paragraphs to result
+            result.content_items.concat intro
+          elsif div.classes.include? 'chapter'
+            # Parse part chapters
+            paragraphs = div.search('p').map { |p| parse_paragraph p }.compact
+
+            # Add paragraphs to the last part header
+            parts.last.sub_item_ids.concat paragraphs.map &:id
+            result.content_items.concat paragraphs
           end
-
-          # Add part heading to result
-          result.content_items << heading
-
-          heading
         end
 
+        # Add parts to result
+        result.content_items.concat parts
+
         parts
-      end
-
-      ##
-      # Parse chapter XHTML object into content item
-      #
-      def parse_chapter(html)
-        # Create new heading
-        heading = Content::Heading.new
-
-        # Set title
-        heading.text = html.at('.chapter-title').content
-
-        # Parse chapter paragraphs
-        paragraphs = html.search('p').map { |p| parse_paragraph p }
-
-        # Add paragraphs to the chapter heading
-        heading.sub_item_ids = paragraphs.map &:id
-        result.content_items.concat paragraphs
-
-        # Add chapter heading to result
-        result.content_items << heading
-
-        heading
       end
 
       ##
@@ -138,6 +117,8 @@ module OpenWebslides
 
         # Extract and sanitize paragraph contents
         paragraph.text = sanitize html.content
+
+        return nil if paragraph.text.empty?
 
         paragraph
       end
