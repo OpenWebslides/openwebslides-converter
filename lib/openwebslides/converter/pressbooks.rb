@@ -50,12 +50,8 @@ module OpenWebslides
         # Set title
         heading.text = html.at('.front-matter-title').content
 
-        paragraphs = Array.new
-
-        # Extract paragraphs
-        html.search('.front-matter p').each do |paragraph|
-          paragraphs << parse_paragraph(paragraph)
-        end
+        # Parse front matter paragraphs
+        paragraphs = html.search('.front-matter p').map { |p| parse_paragraph p }
 
         heading.sub_item_ids = paragraphs.map { |p| p.id }
 
