@@ -1,6 +1,7 @@
 # frozen_string_literal: true
 
 require 'nokogiri'
+require 'reverse_markdown'
 
 module OpenWebslides
   module Converter
@@ -113,7 +114,7 @@ module OpenWebslides
         paragraph = Content::Paragraph.new
 
         # Extract and sanitize paragraph contents
-        paragraph.text = sanitize html.content
+        paragraph.text = sanitize ReverseMarkdown.convert html.to_xhtml
 
         return nil if paragraph.text.empty?
 

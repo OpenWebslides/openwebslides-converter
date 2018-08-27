@@ -10,7 +10,7 @@ module OpenWebslides
         # @return [String]
         #
         def sanitize(text)
-          text.gsub(/[[:space:]]+/, " ")
+          text.gsub(/[[:space:]]+/, ' ')
               .strip
         end
       end
