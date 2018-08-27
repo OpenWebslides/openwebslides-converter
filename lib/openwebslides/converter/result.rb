@@ -11,10 +11,6 @@ module OpenWebslides
       def initialize
         @content_items = []
       end
-
-      def to_s
-        "#{title} by #{author}"
-      end
     end
   end
 end
