@@ -24,9 +24,9 @@ module OpenWebslides
 
         parse_metadata
 
-        root.child_item_ids << parse_front_matter
-        root.child_item_ids.concat parse_parts
-        root.child_item_ids << parse_back_matter
+        root.child_item_ids << parse_matter('front').id
+        root.child_item_ids.concat parse_parts.map(&:id)
+        root.child_item_ids << parse_matter('back').id
 
         result.content_items << root
 
@@ -45,17 +45,19 @@ module OpenWebslides
       end
 
       ##
-      # Find and parse front matter
+      # Find and parse matter
       #
-      def parse_front_matter
+      # @param [String] position 'front' or 'back'
+      #
+      def parse_matter(position)
         # Create new heading
         heading = Content::Heading.new
 
         # Set title
-        heading.text = html.at('.front-matter-title').content
+        heading.text = html.at(".#{position}-matter-title").content
 
         # Parse front matter paragraphs
-        paragraphs = html.search('.front-matter p').map { |p| parse_paragraph p }.compact
+        paragraphs = html.search(".#{position}-matter p").map { |p| parse_paragraph p }.compact
 
         # Add paragraphs to the front matter header
         heading.sub_item_ids = paragraphs.map &:id
@@ -102,11 +104,6 @@ module OpenWebslides
 
         parts
       end
-
-      ##
-      # Find and parse back matter
-      #
-      def parse_back_matter; end
 
       ##
       # Parse paragraph XHTML object into content item
