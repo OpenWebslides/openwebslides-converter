@@ -61,7 +61,7 @@ module OpenWebslides
         paragraphs = html.search(".#{position}-matter p").map { |p| parse_paragraph p }.compact
 
         # Add paragraphs to the front matter header
-        heading.sub_item_ids = paragraphs.map &:id
+        heading.sub_item_ids = paragraphs.map(&:id)
         result.content_items.concat paragraphs
 
         # Add front matter heading to result
@@ -86,7 +86,7 @@ module OpenWebslides
 
             # Part intro (paragraphs under part header)
             intro = div.search('p').map { |p| parse_paragraph p }.compact
-            parts.last.sub_item_ids = intro.map &:id
+            parts.last.sub_item_ids = intro.map(&:id)
 
             # Add intro paragraphs to result
             result.content_items.concat intro
@@ -95,7 +95,7 @@ module OpenWebslides
             paragraphs = div.search('p').map { |p| parse_paragraph p }.compact
 
             # Add paragraphs to the last part header
-            parts.last.sub_item_ids.concat paragraphs.map &:id
+            parts.last.sub_item_ids.concat paragraphs.map(&:id)
             result.content_items.concat paragraphs
           end
         end
