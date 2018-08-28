@@ -91,24 +91,10 @@ module OpenWebslides
             # Add intro paragraphs to result
             result.content_items.concat intro
           elsif div.classes.include? 'chapter'
-            # Create new chapter
-            chapter = Content::Heading.new
-
-            # Set title
-            chapter.text = div.at('.chapter-title').content
-
-            # Parse chapter paragraphs
-            paragraphs = div.search('p').map { |p| parse_paragraph p }.compact
-
-            # Add paragraphs to the chapter heading
-            chapter.sub_item_ids = paragraphs.map(&:id)
-            result.content_items.concat paragraphs
+            chapter = parse_chapter div
 
             # Add chapter heading to the part
             parts.last.sub_item_ids << chapter.id
-
-            # Add chapter heading to the result
-            result.content_items << chapter
           end
         end
 
@@ -116,6 +102,28 @@ module OpenWebslides
         result.content_items.concat parts
 
         parts
+      end
+
+      ##
+      # Parse chapter XHTML object into content item
+      def parse_chapter(html)
+        # Create new chapter
+        chapter = Content::Heading.new
+
+        # Set title
+        chapter.text = html.at('.chapter-title').content
+
+        # Parse chapter paragraphs
+        paragraphs = html.search('p').map { |p| parse_paragraph p }.compact
+
+        # Add paragraphs to the chapter heading
+        chapter.sub_item_ids = paragraphs.map(&:id)
+        result.content_items.concat paragraphs
+
+        # Add chapter heading to the result
+        result.content_items << chapter
+
+        chapter
       end
 
       ##
