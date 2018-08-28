@@ -58,7 +58,7 @@ module OpenWebslides
         heading.text = html.at(".#{position}-matter-title").content
 
         # Parse front matter paragraphs
-        paragraphs = parse_paragraphs html.at(".#{position}-matter")
+        paragraphs = parse_paragraphs html.at(".#{position}-matter-ugc")
 
         # Add paragraphs to the front matter header
         heading.sub_item_ids = paragraphs.map(&:id)
@@ -124,7 +124,7 @@ module OpenWebslides
             paragraph = parse_paragraph child
 
             # Add paragraph to current heading
-            heading.sub_item_ids << paragraph.id
+            heading.sub_item_ids << paragraph.id if paragraph
           elsif child.name == 'h4'
             # Create new heading
             h = Content::Heading.new
@@ -145,7 +145,7 @@ module OpenWebslides
             paragraphs = child.search('li').map { |l| parse_paragraph l }
 
             # Add paragraphs to heading
-            heading.sub_item_ids.concat paragraphs.map(&:id)
+            heading.sub_item_ids.concat paragraphs.map(&:id) if paragraph
           end
         end
 

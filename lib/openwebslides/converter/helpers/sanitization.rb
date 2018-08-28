@@ -11,7 +11,9 @@ module OpenWebslides
         #
         def sanitize(text)
           text.gsub(/[[:space:]]+/, ' ')
+              .gsub(/_&nbsp;_/, '')
               .strip
+              .gsub(/\A&nbsp;\z/, '')
         end
       end
     end
