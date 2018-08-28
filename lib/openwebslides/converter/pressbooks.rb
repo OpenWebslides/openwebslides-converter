@@ -58,11 +58,10 @@ module OpenWebslides
         heading.text = html.at(".#{position}-matter-title").content
 
         # Parse front matter paragraphs
-        paragraphs = html.search(".#{position}-matter p").map { |p| parse_paragraph p }.compact
+        paragraphs = parse_paragraphs html.at(".#{position}-matter")
 
         # Add paragraphs to the front matter header
         heading.sub_item_ids = paragraphs.map(&:id)
-        result.content_items.concat paragraphs
 
         # Add front matter heading to result
         result.content_items << heading
@@ -85,11 +84,10 @@ module OpenWebslides
             parts.last.text = div.at('.part-title').content
 
             # Part intro (paragraphs under part header)
-            intro = div.search('p').map { |p| parse_paragraph p }.compact
-            parts.last.sub_item_ids = intro.map(&:id)
+            intro = parse_paragraphs div
 
-            # Add intro paragraphs to result
-            result.content_items.concat intro
+            # Add intro to part
+            parts.last.sub_item_ids = intro.map(&:id)
           elsif div.classes.include? 'chapter'
             chapter = parse_chapter div
 
@@ -113,17 +111,48 @@ module OpenWebslides
         # Set title
         chapter.text = html.at('.chapter-title').content
 
-        # Parse chapter paragraphs
-        paragraphs = html.search('p').map { |p| parse_paragraph p }.compact
-
-        # Add paragraphs to the chapter heading
-        chapter.sub_item_ids = paragraphs.map(&:id)
-        result.content_items.concat paragraphs
-
-        # Add chapter heading to the result
+        # Add chapter heading to result
         result.content_items << chapter
 
+        # Start with chapter heading as current heading
+        heading = chapter
+
+        # Parse chapter content
+        html.at('.chapter-ugc').children.each do |child|
+          if child.name == 'p'
+            # Parse paragraph
+            paragraph = parse_paragraph child
+
+            # Add paragraph to current heading
+            heading.sub_item_ids << paragraph.id
+          elsif child.name == 'h4'
+            # Create new heading
+            h = Content::Heading.new
+
+            # Set title
+            h.text = child.content
+
+            # Add heading to result
+            result.content_items << h
+
+            # Add heading to current heading
+            chapter.sub_item_ids << h.id
+
+            # Replace current heading
+            heading = h
+          elsif child.name == 'ul'
+
+          end
+        end
+
         chapter
+      end
+
+      ##
+      # Parse XHTML object into paragraph content items
+      #
+      def parse_paragraphs(html)
+        html.search('p').map { |p| parse_paragraph p }
       end
 
       ##
@@ -137,6 +166,9 @@ module OpenWebslides
         paragraph.text = sanitize ReverseMarkdown.convert html.to_xhtml
 
         return nil if paragraph.text.empty?
+
+        # Add paragraph to result
+        result.content_items << paragraph
 
         paragraph
       end
