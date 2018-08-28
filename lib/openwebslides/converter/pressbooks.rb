@@ -141,7 +141,11 @@ module OpenWebslides
             # Replace current heading
             heading = h
           elsif child.name == 'ul'
+            # Extract list items
+            paragraphs = child.search('li').map { |l| parse_paragraph l }
 
+            # Add paragraphs to heading
+            heading.sub_item_ids.concat paragraphs.map(&:id)
           end
         end
 
